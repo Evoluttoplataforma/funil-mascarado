@@ -59,11 +59,10 @@ export const StatusBarFake = () => {
   const batteryColor = batteryLevel <= 20 ? "#FF3B30" : batteryLevel <= 50 ? "#FFD60A" : "currentColor";
 
   return (
-    <div className="h-11 px-6 flex items-center justify-between text-foreground">
+    <div className="px-6 flex items-center justify-between text-foreground" style={{ paddingTop: "env(safe-area-inset-top, 12px)", minHeight: "3rem" }}>
       <span className="text-sm font-semibold tabular-nums">
         {time.hours}:{time.minutes}
       </span>
-      <div className="absolute left-1/2 -translate-x-1/2 w-32 h-8 bg-black rounded-b-3xl" />
       <div className="flex items-center gap-1.5">
         <Signal className="w-4 h-4" />
         <Wifi className="w-4 h-4" />
