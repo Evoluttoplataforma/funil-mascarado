@@ -40,8 +40,12 @@ const Exp2Revelacao = () => {
   }, []);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [initialMessages, preAudio2Messages, sequenceMessages, isTyping, showAudio, showAudio2, showEncryption, scrollToBottom]);
+    // Small delay to ensure DOM has updated before scrolling
+    const timer = setTimeout(() => {
+      scrollToBottom();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [initialMessages, preAudio2Messages, sequenceMessages, isTyping, showAudio, showAudio2, showEncryption, showChoices, showCta, scrollToBottom]);
 
   // Show trust message on mount
   useEffect(() => {

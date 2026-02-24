@@ -75,5 +75,4 @@ export const whatsappMessages: WhatsAppMessage[] = [
 
 export const userChoices = [
   { id: "choice1", text: "Ok, mostra." },
-  { id: "choice2", text: "E se meu negócio for complexo?" },
 ];
