@@ -24,11 +24,11 @@ const Discar = () => {
 
   return (
     <div
-      className={`min-h-[100dvh] max-w-[100vw] overflow-hidden bg-black flex flex-col ${
+      className={`h-[100dvh] w-full overflow-hidden bg-black flex flex-col ${
         isTransitioning ? "animate-fade-out" : ""
       }`}
     >
-      <div className="w-full max-w-[390px] h-[100dvh] mx-auto flex flex-col relative overflow-hidden">
+      <div className="w-full max-w-[430px] h-full mx-auto flex flex-col relative overflow-hidden">
         <StatusBarFake />
 
         <div className="flex-1 flex flex-col items-center px-6 pt-8 pb-4">

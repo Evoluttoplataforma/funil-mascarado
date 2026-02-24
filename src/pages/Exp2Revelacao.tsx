@@ -187,11 +187,11 @@ const Exp2Revelacao = () => {
 
   return (
     <div
-      className={`min-h-screen max-w-[100vw] overflow-x-hidden bg-white flex flex-col ${
+      className={`h-[100dvh] w-full overflow-hidden bg-[#ECE5DD] flex flex-col ${
         isTransitioning ? "animate-fade-out" : ""
       }`}
     >
-      <div className="w-full max-w-[390px] h-[100dvh] mx-auto flex flex-col">
+      <div className="w-full max-w-[430px] h-full mx-auto flex flex-col">
         {/* Header */}
         <WhatsAppHeader name="Titia Eva" status={status} avatar={evaAvatar} />
 
@@ -288,7 +288,7 @@ const Exp2Revelacao = () => {
 
         {/* Input area or CTA */}
         {showCta ? (
-          <div className="p-3 bg-[#F0F0F0] border-t border-gray-300">
+          <div className="p-3 bg-[#F0F0F0] border-t border-gray-300" style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)" }}>
             <button
               onClick={handleNextStep}
               className="w-full flex items-center justify-center gap-3 bg-black text-white font-semibold text-base py-3 px-6 rounded-full min-h-[44px] transition-all duration-200 active:scale-[0.98]"

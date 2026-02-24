@@ -14,7 +14,7 @@ export const WhatsAppInput = ({
   disabled = false,
 }: WhatsAppInputProps) => {
   return (
-    <div className="h-[60px] bg-whatsapp-input flex items-center px-2 gap-2">
+    <div className="bg-whatsapp-input flex items-center px-2 gap-2 py-2" style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 8px)" }}>
       <button
         aria-label="Adicionar"
         className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"

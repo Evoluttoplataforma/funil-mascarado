@@ -53,7 +53,7 @@ const HackerLoading = () => {
 
   return (
     <div 
-      className={`min-h-[100dvh] bg-black flex flex-col items-center justify-center p-6 ${
+      className={`h-[100dvh] bg-black flex flex-col items-center justify-center p-6 overflow-hidden ${
         isTransitioning ? "animate-fade-out" : ""
       }`}
     >

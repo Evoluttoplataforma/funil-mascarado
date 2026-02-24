@@ -98,12 +98,11 @@ const ChamadaAtiva = () => {
 
   return (
     <div 
-      className={`min-h-[100dvh] max-w-[100vw] overflow-hidden ios-gradient flex flex-col ${
+      className={`h-[100dvh] w-full overflow-hidden ios-gradient flex flex-col ${
         isTransitioning ? "animate-fade-out" : ""
       }`}
     >
-      {/* iPhone frame simulation for desktop */}
-      <div className="w-full max-w-[390px] h-[100dvh] mx-auto flex flex-col relative overflow-hidden">
+      <div className="w-full max-w-[430px] h-full mx-auto flex flex-col relative overflow-hidden">
         {/* Status Bar */}
         <StatusBarFake />
 
