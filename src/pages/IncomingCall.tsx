@@ -96,7 +96,7 @@ const IncomingCall = () => {
         <StatusBarFake />
 
         {/* Main content */}
-        <div className="flex-1 flex flex-col items-center justify-between px-4 pt-[15vh] pb-8 overflow-hidden">
+        <div className="flex-1 flex flex-col items-center justify-between px-4 pt-[20vh] pb-8 overflow-hidden" style={{ paddingTop: "max(20vh, env(safe-area-inset-top, 0px) + 15vh)" }}>
           {/* Top section: Avatar + Caller Info */}
           <div className="flex flex-col items-center">
           {/* Avatar with pulse/ring animation */}
