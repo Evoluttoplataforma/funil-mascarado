@@ -54,40 +54,70 @@ const HackerLogin = () => {
           TikTok Privado - Conteúdo Exclusivo
         </p>
 
-        {/* Password display */}
-        <div className="w-full bg-green-500/10 border border-green-500/30 rounded-lg p-4 mb-4">
-          <p className="text-green-500/60 text-xs font-mono mb-2 uppercase">Senha de acesso:</p>
+        {/* Step 1: Copy password */}
+        <div className="w-full bg-green-500/10 border border-green-500/30 rounded-lg p-4 mb-2">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-green-500 text-xs font-mono font-bold bg-green-500/20 w-5 h-5 rounded-full flex items-center justify-center">1</span>
+            <p className="text-green-500/60 text-xs font-mono uppercase">Copie a senha</p>
+          </div>
           <div className="flex items-center justify-between gap-3">
             <code className="text-green-400 text-lg font-mono font-bold tracking-wider">
               {secretPassword}
             </code>
             <button
               onClick={handleCopy}
-              className="p-2 bg-green-500/20 rounded-lg transition-all hover:bg-green-500/30 active:scale-95"
+              className={`px-3 py-2 rounded-lg transition-all active:scale-95 flex items-center gap-2 ${
+                copied
+                  ? "bg-green-500/30 border border-green-500/50"
+                  : "bg-green-500/20 border border-green-500/40 animate-pulse"
+              }`}
             >
               {copied ? (
-                <Check className="w-5 h-5 text-green-400" />
+                <>
+                  <Check className="w-4 h-4 text-green-400" />
+                  <span className="text-green-400 text-xs font-mono">Copiado</span>
+                </>
               ) : (
-                <Copy className="w-5 h-5 text-green-400" />
+                <>
+                  <Copy className="w-4 h-4 text-green-400" />
+                  <span className="text-green-400 text-xs font-mono">Copiar</span>
+                </>
               )}
             </button>
           </div>
         </div>
 
-        {/* Password input */}
+        {/* Arrow indicator */}
+        <div className="flex flex-col items-center my-1 animate-bounce">
+          <span className="text-green-500/60 text-lg">&#8595;</span>
+        </div>
+
+        {/* Step 2: Paste password */}
         <div className="w-full mb-6">
-          <label className="text-green-500/60 text-xs font-mono mb-2 block uppercase">
-            Cole a senha abaixo:
-          </label>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-green-500 text-xs font-mono font-bold bg-green-500/20 w-5 h-5 rounded-full flex items-center justify-center">2</span>
+            <label className="text-green-500/60 text-xs font-mono uppercase">
+              Cole a senha aqui
+            </label>
+          </div>
           <div className="relative">
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500/50" />
             <input
               type="text"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Cole a senha aqui..."
-              className="w-full bg-black border-2 border-green-500/50 rounded-lg py-4 pl-12 pr-4 text-green-400 font-mono placeholder:text-green-500/30 focus:outline-none focus:border-green-500 transition-colors"
+              placeholder="Toque aqui e cole..."
+              className={`w-full bg-black rounded-lg py-4 pl-12 pr-4 text-green-400 font-mono placeholder:text-green-500/30 focus:outline-none transition-all ${
+                password
+                  ? "border-2 border-green-500"
+                  : "border-2 border-green-500/50 border-dashed"
+              }`}
             />
+            {!password && (
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-green-500/40 text-xs font-mono animate-pulse">
+                COLAR
+              </span>
+            )}
           </div>
         </div>
 

@@ -7,7 +7,8 @@ const evaAvatar = "/eva-avatar.png";
 interface VideoSlide {
   id: number;
   title: string;
-  content: string[];
+  content?: string[];
+  videoSrc?: string;
   likes: number;
   comments: number;
   shares: number;
@@ -26,13 +27,7 @@ const videoSlides: VideoSlide[] = [
   {
     id: 1,
     title: "O Problema Real",
-    content: [
-      "O problema nunca foi",
-      "falta de esforço.",
-      "",
-      "Foi falta de um",
-      "SISTEMA que funciona."
-    ],
+    videoSrc: "/video/tiktok-video1.mp4",
     likes: 24300,
     comments: 1200,
     shares: 892
@@ -40,13 +35,7 @@ const videoSlides: VideoSlide[] = [
   {
     id: 2,
     title: "Ferramentas Demais",
-    content: [
-      "CRM, Notion, Slack,",
-      "Planilhas, BI...",
-      "",
-      "Cada uma resolve um pedaço.",
-      "Nenhuma resolve o TODO."
-    ],
+    videoSrc: "/video/tiktok-video2.mp4",
     likes: 18500,
     comments: 890,
     shares: 654
@@ -54,13 +43,7 @@ const videoSlides: VideoSlide[] = [
   {
     id: 3,
     title: "A Verdade",
-    content: [
-      "Consultoria não é",
-      "empresa de produto.",
-      "",
-      "É operação",
-      "INTELECTUAL."
-    ],
+    videoSrc: "/video/tiktok-video3.mp4",
     likes: 31200,
     comments: 2100,
     shares: 1430
@@ -68,44 +51,10 @@ const videoSlides: VideoSlide[] = [
   {
     id: 4,
     title: "O Resultado",
-    content: [
-      "Mais controle aparente.",
-      "Menos controle REAL.",
-      "",
-      "Quem integra tudo",
-      "continua sendo VOCÊ."
-    ],
+    videoSrc: "/video/tiktok-video4.mp4",
     likes: 27800,
     comments: 1560,
     shares: 987
-  },
-  {
-    id: 5,
-    title: "A Solução",
-    content: [
-      "Você precisa de um",
-      "SISTEMA OPERACIONAL",
-      "",
-      "Pensado desde o início",
-      "para CONSULTORIA."
-    ],
-    likes: 42100,
-    comments: 3200,
-    shares: 2100
-  },
-  {
-    id: 6,
-    title: "O Próximo Passo",
-    content: [
-      "Quando esse sistema existe,",
-      "as decisões fluem.",
-      "",
-      "A empresa começa a",
-      "andar SOZINHA."
-    ],
-    likes: 56400,
-    comments: 4500,
-    shares: 3200
   }
 ];
 
@@ -126,11 +75,13 @@ const TikTokPrivado = () => {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [likedVideos, setLikedVideos] = useState<number[]>([]);
-  const [showCta, setShowCta] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showComments, setShowComments] = useState(false);
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
+  const [showFinalCta, setShowFinalCta] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   const currentVideo = videoSlides[currentIndex];
 
@@ -146,16 +97,30 @@ const TikTokPrivado = () => {
       
       if (newIndex !== currentIndex && newIndex >= 0 && newIndex < videoSlides.length) {
         setCurrentIndex(newIndex);
-        
-        // Show CTA when reaching the last video
-        if (newIndex === videoSlides.length - 1) {
-          setTimeout(() => setShowCta(true), 1000);
-        }
+        setShowSwipeHint(false);
+        setShowFinalCta(false);
+
       }
     };
 
     scrollContainer.addEventListener('scroll', handleScroll);
     return () => scrollContainer.removeEventListener('scroll', handleScroll);
+  }, [currentIndex]);
+
+  // Play/pause videos based on current slide
+  useEffect(() => {
+    videoRefs.current.forEach((video, index) => {
+      if (!video) return;
+      if (index === currentIndex) {
+        // Start muted for autoplay to work, then unmute
+        video.muted = true;
+        video.play().then(() => {
+          video.muted = false;
+        }).catch(() => {});
+      } else {
+        video.pause();
+      }
+    });
   }, [currentIndex]);
 
   const handleLike = useCallback((videoId: number) => {
@@ -170,7 +135,7 @@ const TikTokPrivado = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
     setTimeout(() => {
-      navigate("/exp-3-visao");
+      navigate("/sales");
     }, 500);
   }, [navigate, isTransitioning]);
 
@@ -203,9 +168,33 @@ const TikTokPrivado = () => {
                 key={video.id}
                 className="h-[calc(100dvh-56px)] w-full snap-start snap-always relative bg-black"
               >
-                {/* Video background gradient */}
-                <div className="absolute inset-0 bg-gradient-to-b from-gray-900/50 via-black to-gray-900/50" />
-                
+                {/* Video or gradient background */}
+                {video.videoSrc ? (
+                  <video
+                    ref={(el) => { videoRefs.current[index] = el; }}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    src={video.videoSrc}
+                    playsInline
+                    onTimeUpdate={(e) => {
+                      const vid = e.currentTarget;
+                      if (index === currentIndex && index === videoSlides.length - 1 && vid.duration) {
+                        if (vid.duration - vid.currentTime <= 5 && !showFinalCta) {
+                          setShowFinalCta(true);
+                        }
+                      }
+                    }}
+                    onEnded={() => {
+                      if (index === currentIndex) {
+                        if (index < videoSlides.length - 1) {
+                          setShowSwipeHint(true);
+                        }
+                      }
+                    }}
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-b from-gray-900/50 via-black to-gray-900/50" />
+                )}
+
                 {/* Top bar - TikTok style */}
                 <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 pt-12 pb-4">
                   <div className="w-10" />
@@ -220,24 +209,26 @@ const TikTokPrivado = () => {
                   <Search className="w-6 h-6 text-white" />
                 </div>
 
-                {/* Video content - Text slide */}
-                <div className="absolute inset-0 flex items-center justify-center px-10">
-                  <div className="text-center" key={video.id}>
-                    <p className="text-white/50 text-xs font-semibold mb-6 uppercase tracking-[0.2em]">
-                      {video.title}
-                    </p>
-                    {video.content.map((line, lineIndex) => (
-                      <p 
-                        key={lineIndex} 
-                        className={`text-white text-[22px] font-bold leading-[1.4] ${
-                          line === "" ? "h-5" : ""
-                        } ${line.includes("SISTEMA") || line.includes("TODO") || line.includes("INTELECTUAL") || line.includes("REAL") || line.includes("VOCÊ") || line.includes("CONSULTORIA") || line.includes("SOZINHA") ? "text-[#FE2C55]" : ""}`}
-                      >
-                        {line}
+                {/* Video content - Text slide (only for text-based slides) */}
+                {video.content && (
+                  <div className="absolute inset-0 flex items-center justify-center px-10">
+                    <div className="text-center" key={video.id}>
+                      <p className="text-white/50 text-xs font-semibold mb-6 uppercase tracking-[0.2em]">
+                        {video.title}
                       </p>
-                    ))}
+                      {video.content.map((line, lineIndex) => (
+                        <p
+                          key={lineIndex}
+                          className={`text-white text-[22px] font-bold leading-[1.4] ${
+                            line === "" ? "h-5" : ""
+                          } ${line.includes("SISTEMA") || line.includes("TODO") || line.includes("INTELECTUAL") || line.includes("REAL") || line.includes("VOCÊ") || line.includes("CONSULTORIA") || line.includes("SOZINHA") ? "text-[#FE2C55]" : ""}`}
+                        >
+                          {line}
+                        </p>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Right side actions - TikTok style */}
                 <div className="absolute right-2 bottom-20 flex flex-col items-center gap-4">
@@ -293,6 +284,46 @@ const TikTokPrivado = () => {
                   </div>
                 </div>
 
+                {/* Swipe hint - after video ends (not last video) */}
+                {showSwipeHint && video.videoSrc && index === currentIndex && (
+                  <div className="absolute inset-0 z-20 flex items-end justify-center pb-24 bg-gradient-to-t from-black/70 via-transparent to-transparent animate-fade-in">
+                    <div className="flex flex-col items-center gap-2 swipe-hint-bounce">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 19V5M5 12l7-7 7 7" />
+                      </svg>
+                      <p className="text-white text-sm font-semibold">Arrasta pra cima</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Final CTA - after last video ends */}
+                {showFinalCta && video.videoSrc && index === currentIndex && (
+                  <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 animate-fade-in">
+                    <div className="flex flex-col items-center gap-6 px-8">
+                      <p className="text-white text-xl font-bold text-center leading-tight">
+                        Pronto pra ver como<br />isso funciona?
+                      </p>
+
+                      <button
+                        onClick={handleNextStep}
+                        className="relative group w-full max-w-[280px]"
+                      >
+                        {/* Glow rings */}
+                        <span className="absolute inset-0 rounded-full bg-[#FE2C55] blur-xl opacity-40 group-active:opacity-60 cta-pulse" />
+                        <span className="absolute -inset-1 rounded-full border-2 border-[#FE2C55]/50 cta-ping" />
+
+                        {/* Button */}
+                        <span className="relative flex items-center justify-center gap-3 bg-[#FE2C55] text-white font-bold text-lg py-4 px-8 rounded-full shadow-[0_0_30px_rgba(254,44,85,0.5)] transition-transform active:scale-95">
+                          QUERO CONHECER
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                          </svg>
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Bottom info - TikTok style */}
                 <div className="absolute left-3 right-[70px] bottom-4">
                   <div className="flex items-center gap-2 mb-1">
@@ -345,17 +376,6 @@ const TikTokPrivado = () => {
           </button>
         </div>
 
-        {/* CTA Button */}
-        {showCta && (
-          <div className="absolute bottom-20 left-4 right-4 animate-fade-in z-30">
-            <button
-              onClick={handleNextStep}
-              className="w-full flex items-center justify-center gap-3 bg-[#FE2C55] text-white font-bold text-base py-4 px-6 rounded-md transition-all duration-200 active:scale-[0.98]"
-            >
-              Ver como funciona →
-            </button>
-          </div>
-        )}
 
         {/* Comments Modal */}
         {showComments && (
@@ -438,6 +458,27 @@ const TikTokPrivado = () => {
         }
         .animate-slide-up {
           animation: slide-up 0.3s ease-out;
+        }
+        @keyframes swipe-up-bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-12px); }
+        }
+        .swipe-hint-bounce {
+          animation: swipe-up-bounce 1s ease-in-out infinite;
+        }
+        @keyframes cta-pulse {
+          0%, 100% { transform: scale(1); opacity: 0.4; }
+          50% { transform: scale(1.08); opacity: 0.6; }
+        }
+        .cta-pulse {
+          animation: cta-pulse 2s ease-in-out infinite;
+        }
+        @keyframes cta-ping {
+          0% { transform: scale(1); opacity: 0.5; }
+          75%, 100% { transform: scale(1.15); opacity: 0; }
+        }
+        .cta-ping {
+          animation: cta-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
         }
       `}</style>
     </div>
