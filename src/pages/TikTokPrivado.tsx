@@ -85,26 +85,33 @@ const TikTokPrivado = () => {
 
   const currentVideo = videoSlides[currentIndex];
 
-  // Scroll snap handling
+  // Scroll snap handling with debounce
   useEffect(() => {
     const scrollContainer = scrollRef.current;
     if (!scrollContainer) return;
 
-    const handleScroll = () => {
-      const scrollTop = scrollContainer.scrollTop;
-      const itemHeight = scrollContainer.clientHeight;
-      const newIndex = Math.round(scrollTop / itemHeight);
-      
-      if (newIndex !== currentIndex && newIndex >= 0 && newIndex < videoSlides.length) {
-        setCurrentIndex(newIndex);
-        setShowSwipeHint(false);
-        setShowFinalCta(false);
+    let scrollTimeout: ReturnType<typeof setTimeout>;
 
-      }
+    const handleScroll = () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        const scrollTop = scrollContainer.scrollTop;
+        const itemHeight = scrollContainer.clientHeight;
+        const newIndex = Math.round(scrollTop / itemHeight);
+
+        if (newIndex !== currentIndex && newIndex >= 0 && newIndex < videoSlides.length) {
+          setCurrentIndex(newIndex);
+          setShowSwipeHint(false);
+          setShowFinalCta(false);
+        }
+      }, 100);
     };
 
     scrollContainer.addEventListener('scroll', handleScroll);
-    return () => scrollContainer.removeEventListener('scroll', handleScroll);
+    return () => {
+      scrollContainer.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimeout);
+    };
   }, [currentIndex]);
 
   // Play/pause videos based on current slide
@@ -112,11 +119,13 @@ const TikTokPrivado = () => {
     videoRefs.current.forEach((video, index) => {
       if (!video) return;
       if (index === currentIndex) {
-        // Start muted for autoplay to work, then unmute
-        video.muted = true;
-        video.play().then(() => {
-          video.muted = false;
-        }).catch(() => {});
+        // Only play if not already playing
+        if (video.paused) {
+          video.muted = true;
+          video.play().then(() => {
+            video.muted = false;
+          }).catch(() => {});
+        }
       } else {
         video.pause();
       }
