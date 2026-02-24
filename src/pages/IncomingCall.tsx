@@ -11,12 +11,24 @@ const IncomingCall = () => {
   const [isRinging, setIsRinging] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Play ringtone on mount
+  // Vibration pattern: vibrate 800ms, pause 400ms (repeating ringtone feel)
+  const vibrationPattern = [800, 400, 800, 400, 800, 400, 800, 400, 800, 400, 800, 400, 800, 400, 800, 400, 800, 400, 800, 400];
+
+  const startVibration = useCallback(() => {
+    if ("vibrate" in navigator) {
+      navigator.vibrate(vibrationPattern);
+    }
+  }, []);
+
+  // Play ringtone + vibration on mount
   useEffect(() => {
     const audio = new Audio("/audio/ringtone.webm");
     audio.loop = true;
     audioRef.current = audio;
-    
+
+    // Try vibration immediately
+    startVibration();
+
     // Try to play (may require user interaction on some browsers)
     const playPromise = audio.play();
     if (playPromise !== undefined) {
@@ -24,6 +36,7 @@ const IncomingCall = () => {
         // Autoplay was prevented, will play on first user interaction
         const handleInteraction = () => {
           audio.play();
+          startVibration();
           document.removeEventListener("click", handleInteraction);
           document.removeEventListener("touchstart", handleInteraction);
         };
@@ -35,8 +48,11 @@ const IncomingCall = () => {
     return () => {
       audio.pause();
       audio.src = "";
+      if ("vibrate" in navigator) {
+        navigator.vibrate(0); // Stop vibration
+      }
     };
-  }, []);
+  }, [startVibration]);
 
   // Pulse animation effect
   useEffect(() => {
@@ -50,6 +66,9 @@ const IncomingCall = () => {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
+    }
+    if ("vibrate" in navigator) {
+      navigator.vibrate(0);
     }
   }, []);
 
