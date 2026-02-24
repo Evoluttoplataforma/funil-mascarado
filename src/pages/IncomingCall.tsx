@@ -96,7 +96,9 @@ const IncomingCall = () => {
         <StatusBarFake />
 
         {/* Main content */}
-        <div className="flex-1 flex flex-col items-center px-4 pt-6 sm:pt-12 pb-4 overflow-hidden">
+        <div className="flex-1 flex flex-col items-center justify-between px-4 pt-[15vh] pb-8 overflow-hidden">
+          {/* Top section: Avatar + Caller Info */}
+          <div className="flex flex-col items-center">
           {/* Avatar with pulse/ring animation */}
           <div className="relative flex-shrink-0">
             {/* Outer ring pulse */}
@@ -150,10 +152,10 @@ const IncomingCall = () => {
             />
             <p className="text-xs sm:text-[16px] text-green-400">Ligação recebida...</p>
           </div>
+          </div>
 
-          {/* Spacer */}
-          <div className="flex-1 min-h-2" />
-
+          {/* Bottom section: Actions + Buttons */}
+          <div className="flex flex-col items-center">
           {/* Quick Actions */}
           <div className="flex items-center justify-center gap-6 sm:gap-8 mb-3 sm:mb-6 flex-shrink-0">
             <button
@@ -208,6 +210,7 @@ const IncomingCall = () => {
               </div>
               <span className="text-xs sm:text-sm text-muted-foreground">Aceitar</span>
             </button>
+          </div>
           </div>
         </div>
       </div>
