@@ -84,3 +84,21 @@ const audio = new Audio("/ringtone.webm");
 - **iOS**: gray, red (#FF3B30), green (#34C759), blue (#007AFF)
 - **WhatsApp**: green (#075E54), bubbleUser (#DCF8C6), gray (#667781)
 - **Evolutto**: primary, dark, accent (CSS variables)
+
+---
+
+## Skills de Landing Page (contexto separado)
+
+O projeto também contém skills para **criação de Landing Pages para clientes** — um contexto totalmente separado do Funil Mascarado. Essas skills NÃO modificam o funil.
+
+### landing-page-builder
+Skill para gerar LPs completas em HTML + CSS puro (single-file), com tracking integrado, design system próprio e biblioteca de seções reutilizáveis. Inclui references para:
+- `design-system.md` — CSS variables, tipografia, componentes, paletas de cores
+- `section-library.md` — 16 seções modulares com HTML templates
+- `animations.md` — Catálogo de efeitos visuais (scroll reveal, hover, canvas)
+- `tracking-integration.md` — Script completo de rastreamento (UTMs, clicks, sessão)
+- `base-structure.html` — Esqueleto HTML com placeholders
+- `architecture.md` — Arquitetura do LP Builder (Next.js + Claude API + Vercel)
+
+### gtm-tracking-completo
+Skill self-contained com toda a stack de tracking: GTM Web + Server Container → Supabase → n8n → Google Ads Enhanced Conversions → Meta CAPI → Pipedrive Offline Conversions. Cobre setup, troubleshooting, lead scoring e configuração por cliente.
