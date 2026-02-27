@@ -6,7 +6,7 @@ import { TypingIndicator } from "@/components/whatsapp/TypingIndicator";
 import { WhatsAppInput } from "@/components/whatsapp/WhatsAppInput";
 import { AudioBubble } from "@/components/whatsapp/AudioBubble";
 import { QuickReplyButtons } from "@/components/whatsapp/QuickReplyButtons";
-import { messagesBeforeAudio2, whatsappMessages, userChoices, WhatsAppMessage } from "@/data/whatsappMessages";
+import { userChoices, WhatsAppMessage } from "@/data/whatsappMessages";
 import { TikTokIcon } from "@/components/call/TikTokIcon";
 import { EncryptionOverlay } from "@/components/whatsapp/EncryptionOverlay";
 
@@ -17,35 +17,35 @@ const Exp2Revelacao = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [initialMessages, setInitialMessages] = useState<WhatsAppMessage[]>([]);
-  const [preAudio2Messages, setPreAudio2Messages] = useState<WhatsAppMessage[]>([]);
-  const [sequenceMessages, setSequenceMessages] = useState<WhatsAppMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  const [preAudio2Step, setPreAudio2Step] = useState(0);
-  const [preAudio2Done, setPreAudio2Done] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
   const [inputValue, setInputValue] = useState("");
   const [showChoices, setShowChoices] = useState(false);
   const [showCta, setShowCta] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showTrustCheck, setShowTrustCheck] = useState(true);
-  const [showAudio, setShowAudio] = useState(false);
-  const [audioFinished, setAudioFinished] = useState(false);
+
+  // Audio states
+  const [showAudio1, setShowAudio1] = useState(false);
+  const [audio1Finished, setAudio1Finished] = useState(false);
   const [showEncryption, setShowEncryption] = useState(false);
   const [encryptionDone, setEncryptionDone] = useState(false);
   const [showAudio2, setShowAudio2] = useState(false);
   const [audio2Finished, setAudio2Finished] = useState(false);
+  const [showAudio3, setShowAudio3] = useState(false);
+  const [audio3Finished, setAudio3Finished] = useState(false);
+  const [showAudio4, setShowAudio4] = useState(false);
+  const [audio4Finished, setAudio4Finished] = useState(false);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
   useEffect(() => {
-    // Small delay to ensure DOM has updated before scrolling
     const timer = setTimeout(() => {
       scrollToBottom();
     }, 100);
     return () => clearTimeout(timer);
-  }, [initialMessages, preAudio2Messages, sequenceMessages, isTyping, showAudio, showAudio2, showEncryption, showChoices, showCta, scrollToBottom]);
+  }, [initialMessages, isTyping, showAudio1, showAudio2, showAudio3, showAudio4, showEncryption, showChoices, showCta, scrollToBottom]);
 
   // Show trust message on mount
   useEffect(() => {
@@ -67,7 +67,6 @@ const Exp2Revelacao = () => {
   }, [showTrustCheck]);
 
   const handleTrustConfirm = useCallback(() => {
-    // Add user reply
     const userReply: WhatsAppMessage = {
       id: 1,
       text: "pode confiar",
@@ -76,100 +75,64 @@ const Exp2Revelacao = () => {
     setInitialMessages((prev) => [...prev, userReply]);
     setShowTrustCheck(false);
 
-    // Eva starts "recording" then sends audio
+    // Show audio 1 after a brief pause
     setTimeout(() => {
-      setIsTyping(true);
-      setTimeout(() => {
-        setIsTyping(false);
-        setShowAudio(true);
-      }, 1500);
-    }, 500);
+      setShowAudio1(true);
+    }, 800);
   }, []);
 
-  const handleAudioEnded = useCallback(() => {
-    setAudioFinished(true);
+  // Audio 1 ends → show encryption
+  const handleAudio1Ended = useCallback(() => {
+    setAudio1Finished(true);
     setShowEncryption(true);
   }, []);
 
+  // Encryption done → show audio 2
   const handleEncryptionComplete = useCallback(() => {
     setEncryptionDone(true);
+    setTimeout(() => {
+      setShowAudio2(true);
+    }, 500);
   }, []);
 
-  // Messages before audio 2 ("ok", "agora dá pra falar com mais calma")
-  useEffect(() => {
-    if (!encryptionDone || preAudio2Done) return;
-    if (preAudio2Step >= messagesBeforeAudio2.length) {
-      setPreAudio2Done(true);
-      setTimeout(() => {
-        setShowAudio2(true);
-      }, 500);
-      return;
-    }
-
-    const typingDelay = Math.random() * 800 + 800;
-    const messageDelay = Math.random() * 600 + 700;
-
-    const typingTimer = setTimeout(() => {
-      setIsTyping(true);
-    }, 100);
-
-    const messageTimer = setTimeout(() => {
-      setIsTyping(false);
-      setPreAudio2Messages((prev) => [...prev, messagesBeforeAudio2[preAudio2Step]]);
-      setPreAudio2Step((prev) => prev + 1);
-    }, typingDelay + messageDelay);
-
-    return () => {
-      clearTimeout(typingTimer);
-      clearTimeout(messageTimer);
-    };
-  }, [preAudio2Step, encryptionDone, preAudio2Done]);
-
+  // Audio 2 ends → show audio 3
   const handleAudio2Ended = useCallback(() => {
     setAudio2Finished(true);
+    setTimeout(() => {
+      setShowAudio3(true);
+    }, 500);
   }, []);
 
-  // Message sequence — starts after second audio finishes
-  useEffect(() => {
-    if (!audio2Finished) return;
-    if (currentStep >= whatsappMessages.length) {
+  // Audio 3 ends → show audio 4
+  const handleAudio3Ended = useCallback(() => {
+    setAudio3Finished(true);
+    setTimeout(() => {
+      setShowAudio4(true);
+    }, 500);
+  }, []);
+
+  // Audio 4 ends → show choices
+  const handleAudio4Ended = useCallback(() => {
+    setAudio4Finished(true);
+    setTimeout(() => {
       setShowChoices(true);
-      return;
-    }
-
-    const typingDelay = Math.random() * 1000 + 1100;
-    const messageDelay = Math.random() * 800 + 900;
-
-    const typingTimer = setTimeout(() => {
-      setIsTyping(true);
-    }, 100);
-
-    const messageTimer = setTimeout(() => {
-      setIsTyping(false);
-      setSequenceMessages((prev) => [...prev, whatsappMessages[currentStep]]);
-      setCurrentStep((prev) => prev + 1);
-    }, typingDelay + messageDelay);
-
-    return () => {
-      clearTimeout(typingTimer);
-      clearTimeout(messageTimer);
-    };
-  }, [currentStep, audio2Finished]);
+    }, 500);
+  }, []);
 
   const handleChoiceSelect = useCallback((choice: { id: string; text: string }) => {
     setShowChoices(false);
 
     const userMessage: WhatsAppMessage = {
-      id: sequenceMessages.length + 100,
+      id: 100,
       text: choice.text,
       sender: "user",
     };
-    setSequenceMessages((prev) => [...prev, userMessage]);
+    setInitialMessages((prev) => [...prev, userMessage]);
 
     setTimeout(() => {
       setShowCta(true);
     }, 1000);
-  }, [sequenceMessages.length]);
+  }, []);
 
   const handleNextStep = useCallback(() => {
     if (isTransitioning) return;
@@ -179,11 +142,7 @@ const Exp2Revelacao = () => {
     }, 500);
   }, [navigate, isTransitioning]);
 
-  const status = isTyping
-    ? showAudio && !audioFinished
-      ? "Gravando áudio..."
-      : "Digitando..."
-    : "Online";
+  const status = isTyping ? "Gravando áudio..." : "Online";
 
   return (
     <div
@@ -195,9 +154,9 @@ const Exp2Revelacao = () => {
         {/* Header */}
         <WhatsAppHeader name="Titia Eva" status={status} avatar={evaAvatar} />
 
-        {/* Chat area — tudo rola junto */}
+        {/* Chat area */}
         <div className="flex-1 bg-[#ECE5DD] overflow-y-auto px-3 py-4 flex flex-col gap-1 no-scrollbar">
-          {/* 1. Mensagens iniciais (trust + reply) */}
+          {/* 1. Mensagens iniciais (trust + reply + user choice) */}
           {initialMessages.map((msg) => (
             <MessageBubble
               key={`init-${msg.id}`}
@@ -226,37 +185,26 @@ const Exp2Revelacao = () => {
             </div>
           )}
 
-          {/* 3. Áudio (aparece após confirmar) */}
-          {showAudio && (
+          {/* 3. Áudio 1 */}
+          {showAudio1 && (
             <AudioBubble
-              src="/audio/whatsapp-parte3a.mp3"
+              src="/audio/whatsapp-parte1.mp4"
               sender="eva"
               avatar={evaAvatar}
               autoPlay
-              onEnded={handleAudioEnded}
+              onEnded={handleAudio1Ended}
             />
           )}
 
-          {/* 4. Animação de criptografia — some após completar */}
+          {/* 4. Animação de criptografia */}
           {showEncryption && !encryptionDone && (
             <EncryptionOverlay onComplete={handleEncryptionComplete} />
           )}
 
-          {/* 5. Mensagens antes do segundo áudio ("ok", "agora dá pra falar...") */}
-          {preAudio2Messages.map((msg) => (
-            <MessageBubble
-              key={`pre2-${msg.id}`}
-              text={msg.text}
-              sender={msg.sender}
-              delivered={msg.delivered}
-              read={msg.read}
-            />
-          ))}
-
-          {/* 6. Segundo áudio (após mensagens 1-2) */}
+          {/* 5. Áudio 2 */}
           {showAudio2 && (
             <AudioBubble
-              src="/audio/whatsapp-parte3b.mp3"
+              src="/audio/whatsapp-parte2.mp4"
               sender="eva"
               avatar={evaAvatar}
               autoPlay
@@ -264,16 +212,27 @@ const Exp2Revelacao = () => {
             />
           )}
 
-          {/* 6. Mensagens da sequência (aparecem após segundo áudio) */}
-          {sequenceMessages.map((msg) => (
-            <MessageBubble
-              key={`seq-${msg.id}`}
-              text={msg.text}
-              sender={msg.sender}
-              delivered={msg.delivered}
-              read={msg.read}
+          {/* 6. Áudio 3 */}
+          {showAudio3 && (
+            <AudioBubble
+              src="/audio/whatsapp-parte3.mp4"
+              sender="eva"
+              avatar={evaAvatar}
+              autoPlay
+              onEnded={handleAudio3Ended}
             />
-          ))}
+          )}
+
+          {/* 7. Áudio 4 */}
+          {showAudio4 && (
+            <AudioBubble
+              src="/audio/whatsapp-parte4.mp4"
+              sender="eva"
+              avatar={evaAvatar}
+              autoPlay
+              onEnded={handleAudio4Ended}
+            />
+          )}
 
           {isTyping && <TypingIndicator />}
 

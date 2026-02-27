@@ -27,7 +27,7 @@ const ChamadaAtiva = () => {
       a.currentTime = 0;
     });
 
-    const audio = new Audio("/audio/chamada-parte1.mp3");
+    const audio = new Audio("/audio/chamada-parte1.mp4");
     audioRef.current = audio;
 
     audio.addEventListener("ended", () => {

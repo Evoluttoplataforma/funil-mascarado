@@ -18,7 +18,7 @@ const ChamadaAtiva2 = () => {
 
   // Play call audio when component mounts
   useEffect(() => {
-    const audio = new Audio("/audio/chamada-parte2.mp3");
+    const audio = new Audio("/audio/chamada-parte2.mp4");
     audioRef.current = audio;
 
     audio.addEventListener("ended", () => {
